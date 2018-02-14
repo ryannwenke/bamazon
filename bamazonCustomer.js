@@ -1,3 +1,14 @@
+const mysql = require("mysql2");
+const inquirer = require("inquirer");
+
+// let connection = mysql.createConnection({
+// 	host: "localhost",
+// 	port: 3000,
+// 	username: "root",
+// 	password:"",
+// 	database: "bamazon_db"
+// });
+
 //Display all items for sale
 
 //Prompt users with two messages
