@@ -123,7 +123,6 @@ function numberOfItems(itemNames){
      if (itemNames.length != 0) {
        numberOfItems(itemNames);
      } else {
-      
       checkout(); 
      }
      });
@@ -170,7 +169,7 @@ function checkout(){
           choices: ['Continue Shopping', 'Exit']
         }
         ]).then(function(user){
-         //options to continue or stop
+         
          if (user.choice === 'Continue Shopping') {
             printItems(function(){
             selectItem();
@@ -232,7 +231,7 @@ function updateDatabase(fTotal){
          console.log('Thank you for using Bamazon!');
          console.log('Your total is $' + fTotal);
          connection.end();
-              }  // closes else statement
+              }  
         });
       });
   }  
