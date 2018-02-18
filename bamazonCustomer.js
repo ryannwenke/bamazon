@@ -11,7 +11,6 @@ var connection = mysql.createConnection({
      database: "bamazon"
 });
 
-
 connection.connect(function(err) {
     if (err) throw err;
       console.log("connected as id " + connection.threadId);
@@ -20,24 +19,22 @@ connection.connect(function(err) {
     });
 });
 
-
 var shoppingCart = [];
 var totalCost = 0;
 
 function printItems(showtable){
   var table = new Table({
-    head: ['Item ID', 'Product Name', 'Department', 'Price', 'Quantity Available']
+    head: ['Item ID', 'Product Name', 'Department', 'Price', 'In Stock']
   });
   connection.query('SELECT * FROM Products', function(err, res){
     if (err) throw err;
     for (var i = 0; i < res.length; i++) {
-      table.push([res[i].item_id, res[i].product_name, res[i].department_name, '$' + res[i].price_ctc, res[i].stock_quantity]);
+      table.push([res[i].item_id, res[i].product_name, res[i].department_name, '$' + res[i].price, res[i].stock_quantity]);
     }
     console.log(table.toString());
     showtable();
     });
   }
-
 
 function selectItem(){
    var items = [];             
@@ -51,12 +48,12 @@ function selectItem(){
       {
       name: 'choices',
       type: 'checkbox',
-      message: 'Press the space key to select each Product and enter when you are finished shopping.',
+      message: 'Press the space bar to select each product and press enter when you are finished shopping.',
       choices: items
       }
       ]).then(function(customer){
        if (customer.choices.length === 0) {        
-         console.log('Please select an item');
+         console.log('Please select an item!');
          inquirer.prompt([
            {
            name: 'choice',
@@ -88,12 +85,12 @@ function numberOfItems(itemNames){
       var itemCost;  
       var department;  
 
-    connection.query('SELECT stock_quantity, price_ctc, department_name FROM Products WHERE ?', {
+    connection.query('SELECT stock_quantity, price, department_name FROM Products WHERE ?', {
     product_name: item
     }, function(err, res){
      if(err) throw err;
      itemStock = res[0].stock_quantity;
-     itemCost = res[0].price_ctc;
+     itemCost = res[0].price;
      department = res[0].department_name;
      });
     
@@ -101,7 +98,7 @@ function numberOfItems(itemNames){
      {
     name: 'amount',
     type: 'text',
-    message: 'Select how many ' + item + ' you would like to purchase',
+    message: 'Select how many ' + item + ' you would like to purchase.',
 
      validate: function(instock){
          if (parseInt(instock) <= itemStock) {
@@ -132,7 +129,6 @@ function numberOfItems(itemNames){
      });
  }
 
-
 function checkout(){
    if (shoppingCart.length != 0) {  
     var fTotal = 0;      
@@ -142,17 +138,17 @@ function checkout(){
         var amount = shoppingCart[i].amount;
         var cost = shoppingCart[i].itemCost;
         var total = shoppingCart[i].total;
-        var itemCost = cost * amount;
-        fTotal += itemCost;    // adds 
-        console.log(amount + ' ' + item + ' ' + '$' + total);
-      }  // end for loop
+        var itemCost = cost * amount
+        fTotal += itemCost;    
+        console.log(amount + ' ' + item + '' + '$' + total);
+      }  
       console.log("Total: $" + fTotal);  
   
       inquirer.prompt([
        {
          name: 'checkout',
          type: 'list',
-         message: 'Are You Ready To Checkout?',
+         message: 'Are you ready to checkout?',
          choices: ['Checkout', 'Edit Cart']
        }
      ]).then(function(res){
@@ -166,13 +162,11 @@ function checkout(){
           });
           } else {
 
-
-
         inquirer.prompt([
         {
           name: 'choice',
           type: 'list',
-          message: 'The cart is empty, do you want to keep shopping or exit?',
+          message: 'The cart is empty. Do you want to keep shopping or exit?',
           choices: ['Continue Shopping', 'Exit']
         }
         ]).then(function(user){
@@ -188,9 +182,6 @@ function checkout(){
      });  
    }
  } 
-
-
-
 
 function updateDatabase(fTotal){
    var item = shoppingCart.shift();  
@@ -216,7 +207,6 @@ function updateDatabase(fTotal){
       if(err) throw err;
     });
    });
-
 
     connection.query('SELECT stock_quantity FROM Products WHERE ?', {
     product_name: itemName
@@ -247,17 +237,13 @@ function updateDatabase(fTotal){
       });
   }  
 
-
-
-
 function editCart(){
    var items = [];
    for (var i = 0; i < shoppingCart.length; i++) {
      var item = shoppingCart[i].item;
      items.push(item);
    }
-   //prompt the user to select items to edit
-   inquirer.prompt([
+     inquirer.prompt([
      {
      name: 'choices',
      type: 'checkbox',
@@ -274,7 +260,6 @@ function editCart(){
        }
    });
  }
-
 
  function editItem(itemsToEdit){
    if (itemsToEdit.length != 0) {
